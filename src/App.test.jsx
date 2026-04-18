@@ -19,8 +19,8 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 describe('App Dashboard', () => {
-  it('renders without crashing and displays the default Navigate tab', () => {
+  it('renders without crashing and displays the default Map tab', () => {
     render(<App />);
-    expect(screen.getByText('Venue Location')).toBeInTheDocument();
+    expect(screen.getByText('Interactive Map')).toBeInTheDocument();
   });
 });
