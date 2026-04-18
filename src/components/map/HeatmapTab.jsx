@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Activity } from 'lucide-react';
 import VenueMap from './VenueMap';
-import { venueStats } from '../../data/mockData';
+import { getVenueStats } from '../../services/dataService';
 
 const HeatmapTab = ({ setCurrentTab }) => {
+  const [stats, setStats] = useState({ capacityPercentage: 0, highTrafficZones: [] });
+
+  useEffect(() => {
+    let mounted = true;
+    getVenueStats().then((data) => { if (mounted) setStats(data); });
+    return () => { mounted = false; };
+  }, []);
+
   return (
     <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
       <Activity
@@ -16,8 +24,8 @@ const HeatmapTab = ({ setCurrentTab }) => {
         Live Crowd Heatmap
       </h2>
       <p style={{ color: 'var(--text-muted)' }}>
-        The venue is currently at <strong>{venueStats.capacityPercentage}% capacity</strong>.<br />
-        Please avoid the {venueStats.highTrafficZones.join(', ')} area.
+        The venue is currently at <strong>{stats.capacityPercentage}% capacity</strong>.<br />
+        Please avoid the {stats.highTrafficZones.join(', ')} area.
       </p>
       <div style={{ marginTop: '2rem' }}>
         <VenueMap setCurrentTab={setCurrentTab} />
@@ -31,3 +39,4 @@ HeatmapTab.propTypes = {
 };
 
 export default HeatmapTab;
+

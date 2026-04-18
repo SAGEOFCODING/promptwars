@@ -1,21 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import { Navigation, MapPin, Compass, Car } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Navigation, MapPin, Compass, Car, ExternalLink } from 'lucide-react';
 import styles from './NavigateTab.module.css';
+import { logAnalyticsEvent } from '../../config/firebase';
+
+// Madison Square Garden — venue coordinates
+const VENUE_LAT  = 40.7505;
+const VENUE_LNG  = -73.9934;
+const VENUE_NAME = 'Madison Square Garden, New York, NY';
+
+/**
+ * Calculate straight-line distance (Haversine) between two lat/lng points.
+ * Returns distance in miles.
+ */
+const haversineDistanceMi = (lat1, lng1, lat2, lng2) => {
+  const R = 3958.8; // Earth radius in miles
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+};
 
 const NavigateTab = () => {
   const [distance, setDistance] = useState('Calculating...');
-  const [eta, setEta] = useState('-- mins');
-  const [isCalculating, setIsCalculating] = useState(true);
+  const [eta, setEta]           = useState('-- mins');
+  const [gpsStatus, setGpsStatus] = useState('locating'); // locating | active | denied
 
-  // Simulate calculating route via geolocation
+  // Use real browser Geolocation API
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDistance('2.4 mi');
-      setEta('12 mins');
-      setIsCalculating(false);
-    }, 1500);
-    return () => clearTimeout(timer);
+    if (!navigator.geolocation) {
+      setDistance('GPS unavailable');
+      setEta('--');
+      setGpsStatus('denied');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const mi = haversineDistanceMi(latitude, longitude, VENUE_LAT, VENUE_LNG);
+        // Rough estimate: avg driving speed 25 mph in NYC
+        const etaMins = Math.round((mi / 25) * 60);
+        setDistance(`${mi.toFixed(1)} mi`);
+        setEta(`${etaMins} mins`);
+        setGpsStatus('active');
+
+        logAnalyticsEvent('venue_distance_calculated', {
+          distance_mi: mi.toFixed(1),
+          eta_mins: etaMins,
+        });
+      },
+      () => {
+        // Permission denied or error — show a reasonable default
+        setDistance('2.4 mi');
+        setEta('12 mins');
+        setGpsStatus('denied');
+      },
+      { timeout: 8000, maximumAge: 60000 }
+    );
   }, []);
+
+  // Opens Google Maps Directions to the venue in a new tab / native Maps app
+  const handleOpenMaps = useCallback(() => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(VENUE_NAME)}&travelmode=driving`;
+    logAnalyticsEvent('open_maps_directions', { venue: VENUE_NAME });
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }, []);
+
+  // Google Maps Embed URL — free, no API key required for basic embeds
+  const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(VENUE_NAME)}&output=embed&z=15`;
 
   return (
     <div className={styles.container}>
@@ -23,18 +79,21 @@ const NavigateTab = () => {
         Venue Location
       </h2>
 
+      {/* Google Maps Embed */}
       <div className={styles.mapContainer}>
-        {/* Using a generic google maps iframe. We apply a CSS filter to make it look dark mode! */}
         <iframe
-          title="Venue Map"
-          className={styles.iframe}
-          loading="lazy"
+          title="Venue location on Google Maps"
+          src={embedUrl}
+          width="100%"
+          height="100%"
+          style={{ border: 0, borderRadius: '16px', display: 'block' }}
           allowFullScreen
+          loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.3854129524025!2d-73.99596662402526!3d40.75043697138766!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259af18317c2f%3A0x67396a56ecda05b7!2sMadison%20Square%20Garden!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus`}
-        ></iframe>
+        />
       </div>
 
+      {/* Route info card */}
       <div className={styles.routeCard}>
         <div className={styles.routeHeader}>
           <div className={styles.routeTitle}>
@@ -43,14 +102,16 @@ const NavigateTab = () => {
           </div>
           <div className={styles.statusIndicator}>
             <Compass size={14} />
-            {isCalculating ? 'Locating...' : 'Live GPS Active'}
+            {gpsStatus === 'locating' && 'Locating...'}
+            {gpsStatus === 'active'   && 'Live GPS Active'}
+            {gpsStatus === 'denied'   && 'GPS Estimated'}
           </div>
         </div>
 
         <div className={styles.statsGrid}>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>Distance from Venue</span>
-            <span className={`${styles.statValue} ${isCalculating ? '' : 'text-gradient'}`}>
+            <span className={`${styles.statValue} ${gpsStatus !== 'locating' ? 'text-gradient' : ''}`}>
               {distance}
             </span>
           </div>
@@ -62,9 +123,10 @@ const NavigateTab = () => {
           </div>
         </div>
 
-        <button className={styles.actionButton}>
+        <button className={styles.actionButton} onClick={handleOpenMaps} type="button">
           <Car size={20} />
           Open in Maps App
+          <ExternalLink size={14} style={{ marginLeft: 'auto', opacity: 0.7 }} />
         </button>
       </div>
     </div>
@@ -72,3 +134,4 @@ const NavigateTab = () => {
 };
 
 export default NavigateTab;
+

@@ -1,9 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Ticket, Bell, User } from 'lucide-react';
+import { Ticket, Bell, User, LogOut } from 'lucide-react';
 import styles from './Header.module.css';
+import { logout } from '../../config/firebase';
 
-const Header = ({ setCurrentTab }) => {
+const Header = ({ setCurrentTab, user }) => {
+  const handleAuthAction = () => {
+    setCurrentTab?.('login');
+  };
+
   return (
     <header className={styles.header}>
       <div className={styles.logo}>
@@ -14,12 +19,28 @@ const Header = ({ setCurrentTab }) => {
         <button
           className={`${styles.iconButton} ${styles.notificationBadge}`}
           aria-label="Notifications"
-          onClick={() => setCurrentTab && setCurrentTab('alerts')}
+          onClick={() => setCurrentTab?.('alerts')}
         >
           <Bell size={20} />
         </button>
-        <button className={styles.iconButton} aria-label="Profile">
-          <User size={20} />
+        <button
+          className={styles.iconButton}
+          aria-label={user ? 'Profile' : 'Login'}
+          onClick={handleAuthAction}
+          title={user ? `Logged in as ${user.displayName ?? user.email}` : 'Sign in to Eventlytics'}
+        >
+          {user?.photoURL ? (
+            <img
+              src={user.photoURL}
+              alt="Profile"
+              style={{ width: 24, height: 24, borderRadius: '50%' }}
+              referrerPolicy="no-referrer"
+            />
+          ) : user ? (
+            <LogOut size={20} />
+          ) : (
+            <User size={20} />
+          )}
         </button>
       </div>
     </header>
@@ -28,6 +49,8 @@ const Header = ({ setCurrentTab }) => {
 
 Header.propTypes = {
   setCurrentTab: PropTypes.func.isRequired,
+  user: PropTypes.object,
 };
 
 export default Header;
+
