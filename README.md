@@ -1,3 +1,4 @@
+
 # Eventlytics Venue App 🏟️
 
 Eventlytics is a high-performance, mobile-first web application built to enhance the attendee experience at sporting venues. It provides real-time crowd analytics, wait time monitoring, indoor venue mapping, and live notifications.
