@@ -1,34 +1,29 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import QueueCard from './QueueCard';
-import { getQueues } from '../../services/dataService';
+import { subscribeToQueues } from '../../services/dataService';
+import { logAnalyticsEvent } from '../../config/firebase';
 
-const QueueList = () => {
+const QueueList = ({ user }) => {
   const [queues, setQueues] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
-    const fetchQueues = async () => {
-      try {
-        const data = await getQueues();
-        if (mounted) {
-          setQueues(data);
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error("Error fetching queues:", error);
-        if (mounted) setLoading(false);
-      }
-    };
-    fetchQueues();
-    return () => { mounted = false; };
-  }, []);
+    logAnalyticsEvent('queue_list_viewed');
+    
+    const unsubscribe = subscribeToQueues((data) => {
+      setQueues(data);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
 
   return (
     <>
       <h2 style={{ marginBottom: '1rem', fontSize: '1.5rem', fontWeight: 600 }}>Live Wait Times</h2>
       {loading ? (
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }} aria-busy="true">
           Loading wait times...
         </div>
       ) : queues.length === 0 ? (
@@ -36,19 +31,25 @@ const QueueList = () => {
           No queue data available.
         </div>
       ) : (
-        queues.map((queue) => (
-          <QueueCard
-            key={queue.id}
-            title={queue.title}
-            location={queue.location}
-            waitTime={queue.waitTime}
-            type={queue.type}
-            trend={queue.trend}
-          />
-        ))
+        <div aria-live="polite">
+          {queues.map((queue) => (
+            <QueueCard
+              key={queue.id}
+              title={queue.title}
+              location={queue.location}
+              waitTime={queue.waitTime}
+              type={queue.type}
+              trend={queue.trend}
+            />
+          ))}
+        </div>
       )}
     </>
   );
+};
+
+QueueList.propTypes = {
+  user: PropTypes.object,
 };
 
 export default QueueList;

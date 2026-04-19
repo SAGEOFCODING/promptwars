@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Info, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { Info, AlertTriangle, ShieldAlert, Zap } from 'lucide-react';
 import styles from './NotificationFeed.module.css';
-import { getNotifications } from '../../services/dataService';
+import { subscribeToNotifications } from '../../services/dataService';
+import { logAnalyticsEvent, getRemoteConfigValue } from '../../config/firebase';
 
 // ─── Icon helpers ─────────────────────────────────────────────────────────────
 const ICON_MAP = {
-  info:    <Info size={20} />,
-  warning: <AlertTriangle size={20} />,
-  danger:  <ShieldAlert size={20} />,
+  info:    <Info size={20} aria-hidden="true" />,
+  warning: <AlertTriangle size={20} aria-hidden="true" />,
+  danger:  <ShieldAlert size={20} aria-hidden="true" />,
 };
 
 const CLASS_MAP = {
@@ -22,7 +23,7 @@ const getIconClass = (type) => CLASS_MAP[type]   ?? CLASS_MAP.info;
 
 // ─── Sub-component ────────────────────────────────────────────────────────────
 const NotificationCard = ({ notif }) => (
-  <div className={styles.alertCard}>
+  <div className={styles.alertCard} role="alert">
     <div className={`${styles.iconWrapper} ${getIconClass(notif.type)}`}>
       {getIcon(notif.type)}
     </div>
@@ -47,22 +48,26 @@ NotificationCard.propTypes = {
 };
 
 // ─── Main component ───────────────────────────────────────────────────────────
-const NotificationFeed = () => {
+const NotificationFeed = ({ user }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const showEmergency = getRemoteConfigValue('emergency_banner_visible');
+  const trafficWarning = getRemoteConfigValue('high_traffic_warning');
 
   useEffect(() => {
-    let mounted = true;
-    getNotifications()
-      .then((data) => { if (mounted) { setNotifications(data); setLoading(false); } })
-      .catch(() => { if (mounted) { setError(true); setLoading(false); } });
-    return () => { mounted = false; };
-  }, []);
+    logAnalyticsEvent('notification_feed_viewed');
+    
+    const unsubscribe = subscribeToNotifications((data) => {
+      setNotifications(data);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
 
   if (loading) {
     return (
-      <div className={styles.feed}>
+      <div className={styles.feed} aria-busy="true">
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
           Loading live updates...
         </div>
@@ -70,34 +75,32 @@ const NotificationFeed = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className={styles.feed}>
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--danger)' }}>
-          Failed to load updates. Please try again.
+  return (
+    <div className={styles.feedContainer} role="region" aria-label="Notification feed">
+      {showEmergency && (
+        <div className={styles.emergencyBanner} role="alert">
+          <Zap size={18} fill="currentColor" />
+          <span>{trafficWarning}</span>
         </div>
-      </div>
-    );
-  }
-
-  if (notifications.length === 0) {
-    return (
-      <div className={styles.feed}>
+      )}
+      
+      {notifications.length === 0 ? (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
           No recent updates.
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={styles.feed}>
-      {notifications.map((notif) => (
-        <NotificationCard key={notif.id} notif={notif} />
-      ))}
+      ) : (
+        <div className={styles.feed} aria-live="polite">
+          {notifications.map((notif) => (
+            <NotificationCard key={notif.id} notif={notif} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-export default NotificationFeed;
+NotificationFeed.propTypes = {
+  user: PropTypes.object,
+};
 
+export default NotificationFeed;

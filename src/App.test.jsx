@@ -25,9 +25,22 @@ Object.defineProperty(window, 'matchMedia', {
 vi.mock('./config/firebase', () => ({
   auth:                           null,
   db:                             null,
-  loginWithGoogle:                vi.fn(),
+  storage:                        null,
+  loginWithGoogle:                vi.fn().mockResolvedValue({ uid: 'google-sim-user', email: 'google-user@example.com', displayName: 'Google Explorer', photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=google' }),
+  loginWithEmail:                 vi.fn(),
+  registerWithEmail:              vi.fn(),
   logout:                         vi.fn(),
-  logAnalyticsEvent:              vi.fn(),
+  logAnalyticsEvent:              vi.fn().mockResolvedValue(undefined),
+  setAnalyticsUser:               vi.fn().mockResolvedValue(undefined),
+  incrementCounter:               vi.fn().mockResolvedValue(undefined),
+  upsertUserProfile:              vi.fn().mockResolvedValue(undefined),
+  logUserSession:                 vi.fn().mockResolvedValue('session-id'),
+  logUserAction:                  vi.fn().mockResolvedValue(undefined),
+  subscribeToCollection:          vi.fn().mockReturnValue(() => {}),
+  getRemoteConfigValue:           vi.fn().mockReturnValue(null),
+  perf:                           null,
+  remoteConfig:                   null,
+  logBrowserCapabilities:         vi.fn(),
   signInWithEmailAndPassword:     vi.fn(),
   createUserWithEmailAndPassword: vi.fn(),
 }));
@@ -55,6 +68,33 @@ vi.mock('./services/dataService', () => ({
     { id: 2, title: 'Main Merch',   location: 'Gate C',  waitTime: '30 mins', type: 'merch', trend: 'stable' },
   ]),
   getVenueStats: vi.fn().mockResolvedValue({ capacityPercentage: 78, highTrafficZones: ['South Gate'] }),
+  subscribeToZones: vi.fn((cb) => {
+    cb([
+      { id: 'north', name: 'North Gate', crowd: 'low',    wait: '5 mins'  },
+      { id: 'south', name: 'South Gate', crowd: 'high',   wait: '25 mins' },
+      { id: 'field', name: 'Main Field', crowd: 'low',    wait: 'No Queue' },
+      { id: 'food1', name: 'Food Court', crowd: 'medium', wait: '12 mins' },
+      { id: 'merch', name: 'Merch Store',crowd: 'high',   wait: '30 mins' },
+    ]);
+    return vi.fn();
+  }),
+  subscribeToNotifications: vi.fn((cb) => {
+    cb([
+      { id: 1, type: 'danger',  title: 'High Crowd', message: 'South Gate congested', time: '2 mins ago'  },
+    ]);
+    return vi.fn();
+  }),
+  subscribeToQueues: vi.fn((cb) => {
+    cb([
+      { id: 1, title: 'Food Court A', location: 'Sec 102', waitTime: '12 mins', type: 'food',  trend: 'up'     },
+      { id: 2, title: 'Main Merch',   location: 'Gate C',  waitTime: '30 mins', type: 'merch', trend: 'stable' },
+    ]);
+    return vi.fn();
+  }),
+  logZoneInteraction: vi.fn().mockResolvedValue(undefined),
+  logNavigationAction: vi.fn().mockResolvedValue(undefined),
+  submitCrowdReport: vi.fn().mockResolvedValue('report-id'),
+  saveUserPreferences: vi.fn().mockResolvedValue(undefined),
 }));
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

@@ -7,9 +7,16 @@ import styles from './Layout.module.css';
 const Layout = ({ children, currentTab, setCurrentTab, user }) => {
   return (
     <div className={styles.layout}>
+      <a href="#main-content" className={styles.skipLink}>
+        Skip to content
+      </a>
       <Header setCurrentTab={setCurrentTab} user={user} />
-      <main className={styles.mainContent}>{children}</main>
-      <BottomNav currentTab={currentTab} setCurrentTab={setCurrentTab} />
+      <main id="main-content" className={styles.mainContent} role="main" tabIndex="-1">
+        {children}
+      </main>
+      <nav aria-label="Bottom Navigation">
+        <BottomNav currentTab={currentTab} setCurrentTab={setCurrentTab} />
+      </nav>
     </div>
   );
 };
@@ -22,4 +29,3 @@ Layout.propTypes = {
 };
 
 export default Layout;
-

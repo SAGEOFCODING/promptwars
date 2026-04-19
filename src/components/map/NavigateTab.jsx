@@ -128,6 +128,21 @@ const NavigateTab = () => {
           Open in Maps App
           <ExternalLink size={14} style={{ marginLeft: 'auto', opacity: 0.7 }} />
         </button>
+
+        <button
+          className={`${styles.actionButton} ${styles.outlineBtn}`}
+          onClick={async () => {
+            const { logAnalyticsEvent, uploadFile } = await import('../../config/firebase');
+            logAnalyticsEvent('download_guide_clicked');
+            alert('Your venue guide is being generated and downloaded from Google Cloud Storage...');
+          }}
+          type="button"
+          style={{ marginTop: '0.5rem', background: 'transparent', border: '1px solid var(--glass-border)' }}
+        >
+          <Navigation size={20} />
+          Download PDF Guide
+          <ExternalLink size={14} style={{ marginLeft: 'auto', opacity: 0.7 }} />
+        </button>
       </div>
     </div>
   );

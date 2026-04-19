@@ -4,13 +4,18 @@ import { Activity } from 'lucide-react';
 import VenueMap from './VenueMap';
 import { getVenueStats } from '../../services/dataService';
 
-const HeatmapTab = ({ setCurrentTab }) => {
+const HeatmapTab = ({ setCurrentTab, user }) => {
   const [stats, setStats] = useState({ capacityPercentage: 0, highTrafficZones: [] });
 
   useEffect(() => {
     let mounted = true;
-    getVenueStats().then((data) => { if (mounted) setStats(data); });
-    return () => { mounted = false; };
+    import('../../config/firebase').then((m) => m.logAnalyticsEvent('heatmap_view'));
+    getVenueStats().then((data) => {
+      if (mounted) setStats(data);
+    });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return (
@@ -28,7 +33,7 @@ const HeatmapTab = ({ setCurrentTab }) => {
         Please avoid the {stats.highTrafficZones.join(', ')} area.
       </p>
       <div style={{ marginTop: '2rem' }}>
-        <VenueMap setCurrentTab={setCurrentTab} />
+        <VenueMap setCurrentTab={setCurrentTab} user={user} />
       </div>
     </div>
   );
@@ -36,7 +41,9 @@ const HeatmapTab = ({ setCurrentTab }) => {
 
 HeatmapTab.propTypes = {
   setCurrentTab: PropTypes.func.isRequired,
+  user: PropTypes.object,
 };
+
 
 export default HeatmapTab;
 

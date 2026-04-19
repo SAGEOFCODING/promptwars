@@ -4,10 +4,13 @@ import styles from './Login.module.css';
 import {
   auth,
   loginWithGoogle,
+  loginWithEmail,
+  registerWithEmail,
   logout,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
+  logAnalyticsEvent,
+  incrementCounter,
 } from '../../config/firebase';
+import { sanitizeInput, isValidEmail, checkRateLimit, logSecurityEvent } from '../../services/security';
 
 const FIREBASE_NOT_CONFIGURED = !auth;
 
@@ -78,11 +81,22 @@ const Login = ({ user, onSuccess }) => {
     e.preventDefault();
     setError('');
 
-    const trimmedEmail    = email.trim().toLowerCase();
+    const trimmedEmail    = sanitizeInput(email).toLowerCase();
     const trimmedPassword = password.trim();
 
     if (!trimmedEmail || !trimmedPassword) {
       setError('Please fill in all fields.');
+      return;
+    }
+
+    if (!isValidEmail(trimmedEmail)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (!checkRateLimit(trimmedEmail)) {
+      setError('Too many attempts. Please try again later.');
+      logSecurityEvent('BRUTE_FORCE_ATTEMPT', { email: trimmedEmail });
       return;
     }
 
@@ -103,9 +117,9 @@ const Login = ({ user, onSuccess }) => {
     setLoading(true);
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, trimmedEmail, trimmedPassword);
+        await loginWithEmail(trimmedEmail, trimmedPassword);
       } else {
-        await createUserWithEmailAndPassword(auth, trimmedEmail, trimmedPassword);
+        await registerWithEmail(trimmedEmail, trimmedPassword);
       }
       onSuccess?.();
     } catch (err) {
@@ -164,13 +178,18 @@ const Login = ({ user, onSuccess }) => {
             <button
               type="button"
               className={styles.guestBtn}
-              onClick={() => {
-                onSuccess?.({
+              onClick={async () => {
+                const guestUser = {
                   uid: 'guest-user',
                   email: 'guest@eventlytics.io',
                   displayName: 'Guest Explorer',
                   photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=guest',
-                });
+                };
+                await Promise.allSettled([
+                  logAnalyticsEvent('login', { method: 'guest' }),
+                  incrementCounter('guest_logins'),
+                ]);
+                onSuccess?.(guestUser);
               }}
             >
               👤 Sign in as Guest
