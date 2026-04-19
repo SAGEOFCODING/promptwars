@@ -1,37 +1,26 @@
-# Eventlytics - Real-Time Venue Intelligence
+# Eventlytics | Real-Time Venue Intelligence
 
-Eventlytics is a production-grade, mobile-first web application designed for large-scale sporting venues. It provides real-time crowd insights, venue navigation, and wait-time tracking.
+Eventlytics is a high-performance, mobile-first venue management application designed for large-scale stadiums and events. It leverages a modern, hardened tech stack to provide real-time crowd insights, wait times, and emergency navigation.
 
-## 🏗️ Architecture
-- **Framework**: React 19 + Vite 8
-- **State Management**: React Hooks + Firestore Real-Time Listeners
-- **Security**: Content Security Policy (CSP), DOMPurify, Rate Limiting, and Firebase App Check.
-- **Performance**: Multi-stage Docker builds, manual chunking for vendor assets, and PWA capabilities.
-- **Testing**: Vitest + React Testing Library (100% pass rate).
+## 🏛️ Architecture & Engineering Standards
 
-## 🛡️ Security Hardening
-- **XSS Prevention**: Strict CSP headers and DOMPurify sanitization on all user inputs.
-- **Brute-Force Protection**: Client-side rate limiting via `useRateLimit` hook.
-- **Infrastructure**: Firebase Security Rules for Firestore and Storage, enforcing strict per-user access.
-- **Privacy**: Anonymous authentication fallback with secure Guest Mode.
+### ⚛️ Atomic Design Pattern
+The component library follows the **Atomic Design** methodology to ensure maximum scalability and reusability:
+- **Atoms**: Fundamental UI elements (Buttons, Icons).
+- **Molecules**: Compound components (Queue Cards, Input Groups).
+- **Organisms**: Complex feature blocks (Venue Map, Notification Feed).
+- **Templates**: Page-level layout structures.
 
-## ⚡ Performance Optimization
-- **Lighthouse Goals**: Target 98%+ score across all categories.
-- **Bundle Analysis**: Optimized vendor chunking for Firebase and React.
-- **PWA**: Offline support and asset precaching via `vite-plugin-pwa`.
+### 🎣 Logic Decoupling (Custom Hooks)
+Business logic is strictly decoupled from the UI layer via **Custom React Hooks**. This ensures that components remain pure and the data synchronization logic is independently testable.
+- `useVenueData`: Real-time zone synchronization.
+- `useAuthSession`: Global authentication state.
+- `useNotifications`: Security and info alert streaming.
 
-## ♿ Accessibility (WCAG 2.1)
-- Full keyboard navigation support for interactive SVG maps.
-- ARIA landmarks and live regions (`aria-live="polite"`) for real-time notifications.
-- "Skip to Content" accessibility link and high-contrast glassmorphism UI.
+### 🛡️ Defensive Engineering
+- **Security**: Strict Content Security Policy (CSP), DOM sanitization (DOMPurify), and client-side rate limiting.
+- **Stability**: Global unhandled exception listeners and production-grade Error Boundaries.
+- **Telemetry**: Abstracted Firebase Performance and Analytics tracking.
 
-## 🛠️ Developer Setup
-```bash
-npm install
-npm run dev
-npm run test
-npm run build
-```
-
----
-Deployed to **Google Cloud Run** using automated CI/CD patterns.
+## 🚀 Deployment
+Deployed on **Google Cloud Run** with an automated containerized pipeline and NGINX security hardening.

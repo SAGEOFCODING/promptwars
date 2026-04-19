@@ -9,8 +9,24 @@ import {
   doc,
   setDoc,
 } from 'firebase/firestore';
-import { db, logAnalyticsEvent, incrementCounter } from '../config/firebase';
-import { venueZonesData, notificationsData, queueData, venueStats } from '../data/mockData';
+import { db, logAnalyticsEvent, incrementCounter } from '@/config/firebase';
+
+/**
+ * @typedef {Object} Zone
+ * @property {string} id - Unique identifier for the zone
+ * @property {string} name - Display name of the zone
+ * @property {('low'|'medium'|'high')} crowd - Current crowd density level
+ * @property {string} wait - Estimated wait time string
+ */
+
+/**
+ * @typedef {Object} Queue
+ * @property {string|number} id - Unique identifier
+ * @property {string} title - Queue name
+ * @property {string} location - Physical location
+ * @property {string} waitTime - Time estimate
+ * @property {('food'|'security'|'restroom')} type - Category
+ */
 
 // Whether we have a real Firebase project configured
 const hasFirebase =
