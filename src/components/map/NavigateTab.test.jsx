@@ -16,7 +16,9 @@ const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
 // NavigateTab gracefully falls back to default values when denied
 
 describe('NavigateTab', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('renders the venue location heading', () => {
     render(<NavigateTab />);

@@ -33,7 +33,7 @@ const fetchCollection = async (collectionName, constraints = [], fallback) => {
       }
       // Collection empty — seed it with fallback data
       await seedCollection(collectionName, fallback);
-    } catch (err) {
+    } catch {
       console.warn(`[dataService] ${collectionName} fetch failed, using local data.`);
     }
   }
@@ -63,14 +63,12 @@ const seedCollection = async (collectionName, data) => {
 
 // ─── Public Data Fetching API ─────────────────────────────────────────────────
 
-export const getVenueZones = () =>
-  fetchCollection('zones', [], venueZonesData);
+export const getVenueZones = () => fetchCollection('zones', [], venueZonesData);
 
 export const getNotifications = () =>
   fetchCollection('notifications', [orderBy('timestamp', 'desc')], notificationsData);
 
-export const getQueues = () =>
-  fetchCollection('queues', [], queueData);
+export const getQueues = () => fetchCollection('queues', [], queueData);
 
 export const getVenueStats = async () => {
   if (hasFirebase && db) {

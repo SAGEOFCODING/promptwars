@@ -10,7 +10,7 @@ const QueueList = ({ user }) => {
 
   useEffect(() => {
     logAnalyticsEvent('queue_list_viewed');
-    
+
     const unsubscribe = subscribeToQueues((data) => {
       setQueues(data);
       setLoading(false);
@@ -23,7 +23,10 @@ const QueueList = ({ user }) => {
     <>
       <h2 style={{ marginBottom: '1rem', fontSize: '1.5rem', fontWeight: 600 }}>Live Wait Times</h2>
       {loading ? (
-        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }} aria-busy="true">
+        <div
+          style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}
+          aria-busy="true"
+        >
           Loading wait times...
         </div>
       ) : queues.length === 0 ? (

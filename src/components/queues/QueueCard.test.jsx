@@ -3,7 +3,13 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import QueueCard from './QueueCard';
 
-const baseProps = { title: 'Main Merch Store', location: 'Gate C', waitTime: '30 mins', type: 'merch', trend: 'stable' };
+const baseProps = {
+  title: 'Main Merch Store',
+  location: 'Gate C',
+  waitTime: '30 mins',
+  type: 'merch',
+  trend: 'stable',
+};
 
 describe('QueueCard', () => {
   it('renders all core details', () => {
@@ -29,4 +35,3 @@ describe('QueueCard', () => {
     expect(screen.getByText('Main Merch Store')).toBeInTheDocument();
   });
 });
-

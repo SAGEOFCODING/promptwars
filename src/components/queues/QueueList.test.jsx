@@ -36,7 +36,14 @@ describe('QueueList', () => {
   it('renders queue cards when data is available', async () => {
     dataService.subscribeToQueues.mockImplementation((cb) => {
       cb([
-        { id: 1, title: 'Food Court A', location: 'Sec 1', waitTime: '10 mins', type: 'food', trend: 'stable' },
+        {
+          id: 1,
+          title: 'Food Court A',
+          location: 'Sec 1',
+          waitTime: '10 mins',
+          type: 'food',
+          trend: 'stable',
+        },
       ]);
       return () => {};
     });

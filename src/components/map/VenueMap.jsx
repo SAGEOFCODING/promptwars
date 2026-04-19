@@ -1,10 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Navigation } from 'lucide-react';
 import styles from './VenueMap.module.css';
-import { subscribeToZones, logZoneInteraction, submitCrowdReport } from '../../services/dataService';
+import {
+  subscribeToZones,
+  logZoneInteraction,
+  submitCrowdReport,
+} from '../../services/dataService';
 import { logAnalyticsEvent, perf } from '../../config/firebase';
 import { trace } from 'firebase/performance';
+import { logger } from '../../services/logger';
+import DOMPurify from 'dompurify';
 
 const VenueMap = ({ setCurrentTab, user }) => {
   const [activeZone, setActiveZone] = useState(null);
@@ -24,6 +30,7 @@ const VenueMap = ({ setCurrentTab, user }) => {
         setLoading(false);
         isFirstUpdate = false;
         logAnalyticsEvent('venue_map_loaded', { zone_count: zones.length });
+        logger.info('Venue map initialized', { zoneCount: zones.length });
       }
     });
 
@@ -52,10 +59,7 @@ const VenueMap = ({ setCurrentTab, user }) => {
     await submitCrowdReport(user?.uid, activeZoneData.id, level);
   };
 
-  const activeZoneData = useMemo(
-    () => zonesData.find((z) => z.id === activeZone),
-    [activeZone, zonesData]
-  );
+  const activeZoneData = zonesData.find((z) => z.id === activeZone);
 
   return (
     <div className={styles.mapContainer}>
@@ -99,7 +103,12 @@ const VenueMap = ({ setCurrentTab, user }) => {
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && handleZoneClick('field')}
               />
-              <text x="150" y="155" className={styles.zoneText} onClick={() => handleZoneClick('field')}>
+              <text
+                x="150"
+                y="155"
+                className={styles.zoneText}
+                onClick={() => handleZoneClick('field')}
+              >
                 Main Field
               </text>
 
@@ -113,7 +122,12 @@ const VenueMap = ({ setCurrentTab, user }) => {
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && handleZoneClick('north')}
               />
-              <text x="150" y="48" className={styles.zoneText} onClick={() => handleZoneClick('north')}>
+              <text
+                x="150"
+                y="48"
+                className={styles.zoneText}
+                onClick={() => handleZoneClick('north')}
+              >
                 North Gate
               </text>
 
@@ -127,7 +141,12 @@ const VenueMap = ({ setCurrentTab, user }) => {
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && handleZoneClick('south')}
               />
-              <text x="150" y="255" className={styles.zoneText} onClick={() => handleZoneClick('south')}>
+              <text
+                x="150"
+                y="255"
+                className={styles.zoneText}
+                onClick={() => handleZoneClick('south')}
+              >
                 South Gate
               </text>
 
@@ -143,7 +162,12 @@ const VenueMap = ({ setCurrentTab, user }) => {
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && handleZoneClick('food1')}
               />
-              <text x="35" y="155" className={styles.zoneText} onClick={() => handleZoneClick('food1')}>
+              <text
+                x="35"
+                y="155"
+                className={styles.zoneText}
+                onClick={() => handleZoneClick('food1')}
+              >
                 Food
               </text>
 
@@ -159,7 +183,12 @@ const VenueMap = ({ setCurrentTab, user }) => {
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && handleZoneClick('merch')}
               />
-              <text x="265" y="155" className={styles.zoneText} onClick={() => handleZoneClick('merch')}>
+              <text
+                x="265"
+                y="155"
+                className={styles.zoneText}
+                onClick={() => handleZoneClick('merch')}
+              >
                 Merch
               </text>
             </svg>
@@ -213,28 +242,47 @@ const VenueMap = ({ setCurrentTab, user }) => {
                     </button>
                   </div>
 
-                  <div className={styles.uploadContainer} style={{ marginTop: '1rem', borderTop: '1px solid var(--glass-border)', paddingTop: '1rem' }}>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                  <div
+                    className={styles.uploadContainer}
+                    style={{
+                      marginTop: '1rem',
+                      borderTop: '1px solid var(--glass-border)',
+                      paddingTop: '1rem',
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: '0.8rem',
+                        color: 'var(--text-muted)',
+                        marginBottom: '0.5rem',
+                      }}
+                    >
                       Add a photo to help others verify (Optional)
                     </p>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      id="report-photo" 
-                      style={{ display: 'none' }} 
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="report-photo"
+                      style={{ display: 'none' }}
                       onChange={async (e) => {
                         const file = e.target.files[0];
                         if (file) {
-                          const { uploadIncidentImage } = await import('../../services/storageService');
+                          const { uploadIncidentImage } =
+                            await import('../../services/storageService');
                           const url = await uploadIncidentImage(file, activeZoneData.id);
                           if (url) alert('Photo uploaded successfully!');
                         }
                       }}
                     />
-                    <label 
-                      htmlFor="report-photo" 
+                    <label
+                      htmlFor="report-photo"
                       className={styles.reportBtn}
-                      style={{ width: '100%', cursor: 'pointer', textAlign: 'center', display: 'block' }}
+                      style={{
+                        width: '100%',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        display: 'block',
+                      }}
                     >
                       📷 Upload Photo
                     </label>

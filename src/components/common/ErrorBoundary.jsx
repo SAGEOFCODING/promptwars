@@ -19,18 +19,20 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{
-          padding: '2rem',
-          textAlign: 'center',
-          color: 'var(--text-main)',
-          background: 'var(--bg-card)',
-          borderRadius: '16px',
-          margin: '2rem',
-          border: '1px solid var(--glass-border)'
-        }}>
+        <div
+          style={{
+            padding: '2rem',
+            textAlign: 'center',
+            color: 'var(--text-main)',
+            background: 'var(--bg-card)',
+            borderRadius: '16px',
+            margin: '2rem',
+            border: '1px solid var(--glass-border)',
+          }}
+        >
           <h2>Something went wrong.</h2>
           <p>Please try refreshing the page or contact support if the issue persists.</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="btn-primary"
             style={{ marginTop: '1rem' }}
@@ -46,7 +48,7 @@ class ErrorBoundary extends React.Component {
 }
 
 ErrorBoundary.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 };
 
 export default ErrorBoundary;

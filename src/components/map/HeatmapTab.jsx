@@ -44,6 +44,4 @@ HeatmapTab.propTypes = {
   user: PropTypes.object,
 };
 
-
 export default HeatmapTab;
-

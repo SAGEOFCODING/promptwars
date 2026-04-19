@@ -7,26 +7,24 @@ import { logAnalyticsEvent, getRemoteConfigValue } from '../../config/firebase';
 
 // ─── Icon helpers ─────────────────────────────────────────────────────────────
 const ICON_MAP = {
-  info:    <Info size={20} aria-hidden="true" />,
+  info: <Info size={20} aria-hidden="true" />,
   warning: <AlertTriangle size={20} aria-hidden="true" />,
-  danger:  <ShieldAlert size={20} aria-hidden="true" />,
+  danger: <ShieldAlert size={20} aria-hidden="true" />,
 };
 
 const CLASS_MAP = {
-  info:    styles.iconInfo,
+  info: styles.iconInfo,
   warning: styles.iconWarning,
-  danger:  styles.iconDanger,
+  danger: styles.iconDanger,
 };
 
-const getIcon      = (type) => ICON_MAP[type]    ?? ICON_MAP.info;
-const getIconClass = (type) => CLASS_MAP[type]   ?? CLASS_MAP.info;
+const getIcon = (type) => ICON_MAP[type] ?? ICON_MAP.info;
+const getIconClass = (type) => CLASS_MAP[type] ?? CLASS_MAP.info;
 
 // ─── Sub-component ────────────────────────────────────────────────────────────
 const NotificationCard = ({ notif }) => (
   <div className={styles.alertCard} role="alert">
-    <div className={`${styles.iconWrapper} ${getIconClass(notif.type)}`}>
-      {getIcon(notif.type)}
-    </div>
+    <div className={`${styles.iconWrapper} ${getIconClass(notif.type)}`}>{getIcon(notif.type)}</div>
     <div className={styles.content}>
       <div className={styles.header}>
         <span className={styles.title}>{notif.title}</span>
@@ -39,11 +37,11 @@ const NotificationCard = ({ notif }) => (
 
 NotificationCard.propTypes = {
   notif: PropTypes.shape({
-    id:      PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    type:    PropTypes.oneOf(['info', 'warning', 'danger']).isRequired,
-    title:   PropTypes.string.isRequired,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    type: PropTypes.oneOf(['info', 'warning', 'danger']).isRequired,
+    title: PropTypes.string.isRequired,
     message: PropTypes.string.isRequired,
-    time:    PropTypes.string.isRequired,
+    time: PropTypes.string.isRequired,
   }).isRequired,
 };
 
@@ -56,7 +54,7 @@ const NotificationFeed = ({ user }) => {
 
   useEffect(() => {
     logAnalyticsEvent('notification_feed_viewed');
-    
+
     const unsubscribe = subscribeToNotifications((data) => {
       setNotifications(data);
       setLoading(false);
@@ -83,7 +81,7 @@ const NotificationFeed = ({ user }) => {
           <span>{trafficWarning}</span>
         </div>
       )}
-      
+
       {notifications.length === 0 ? (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
           No recent updates.

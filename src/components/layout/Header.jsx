@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Ticket, Bell, User, LogOut } from 'lucide-react';
 import styles from './Header.module.css';
-import { logout } from '../../config/firebase';
 
 const Header = ({ setCurrentTab, user }) => {
   const handleAuthAction = () => {
@@ -53,4 +52,3 @@ Header.propTypes = {
 };
 
 export default Header;
-

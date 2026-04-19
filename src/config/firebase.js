@@ -10,8 +10,6 @@ import {
   limit,
   setDoc,
   doc,
-  getDoc,
-  updateDoc,
   increment,
 } from 'firebase/firestore';
 import {
@@ -35,17 +33,18 @@ import {
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getPerformance } from 'firebase/performance';
 import { getRemoteConfig, fetchAndActivate, getValue } from 'firebase/remote-config';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { getMessaging, getToken } from 'firebase/messaging';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 // ─── Firebase Config ────────────────────────────────────────────────────────
 const firebaseConfig = {
-  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Only initialize if we have a real project ID
@@ -60,10 +59,10 @@ const app = isConfigured
   : null;
 
 // ─── Core Services ───────────────────────────────────────────────────────────
-export const db             = isConfigured ? getFirestore(app) : null;
-export const auth           = isConfigured ? getAuth(app)      : null;
+export const db = isConfigured ? getFirestore(app) : null;
+export const auth = isConfigured ? getAuth(app) : null;
 export const googleProvider = isConfigured ? new GoogleAuthProvider() : null;
-export const storage        = isConfigured ? getStorage(app)   : null;
+export const storage = isConfigured ? getStorage(app) : null;
 
 // Set auth persistence to local so sessions survive page refresh
 if (auth) {
@@ -136,7 +135,7 @@ export const remoteConfig = (() => {
     rc.defaultConfig = {
       emergency_banner_visible: false,
       high_traffic_warning: 'Normal traffic levels detected.',
-      map_feature_enabled: true
+      map_feature_enabled: true,
     };
     remoteConfigInstance = rc;
     // Fetch and activate in background
@@ -146,6 +145,18 @@ export const remoteConfig = (() => {
     return null;
   }
 })();
+
+// ─── Firebase App Check ──────────────────────────────────────────────────────
+if (isConfigured && typeof window !== 'undefined') {
+  try {
+    initializeAppCheck(app, {
+      provider: new ReCaptchaV3Provider('6Lc_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X'), // Generic placeholder
+      isTokenAutoRefreshEnabled: true,
+    });
+  } catch {
+    // App Check already initialized or not supported in this environment
+  }
+}
 
 // ─── Firebase Cloud Messaging ────────────────────────────────────────────────
 let messagingInstance = null;
@@ -164,7 +175,7 @@ export const requestNotificationPermission = async () => {
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
       const token = await getToken(messagingInstance, {
-        vapidKey: 'BM-X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X' // Generic placeholder
+        vapidKey: 'BM-X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X', // Generic placeholder
       });
       return token;
     }
@@ -191,7 +202,7 @@ export const logBrowserCapabilities = () => {
     serviceWorker: 'serviceWorker' in navigator,
     indexedDB: !!window.indexedDB,
     storageQuota: !!navigator.storage,
-    pwa: window.matchMedia('(display-mode: standalone)').matches
+    pwa: window.matchMedia('(display-mode: standalone)').matches,
   };
   logAnalyticsEvent('browser_capabilities', caps);
 };
@@ -248,11 +259,11 @@ export const upsertUserProfile = async (user) => {
     await setDoc(
       ref,
       {
-        uid:         user.uid,
-        email:       user.email ?? null,
+        uid: user.uid,
+        email: user.email ?? null,
         displayName: user.displayName ?? null,
-        photoURL:    user.photoURL ?? null,
-        lastSeen:    serverTimestamp(),
+        photoURL: user.photoURL ?? null,
+        lastSeen: serverTimestamp(),
       },
       { merge: true }
     );
@@ -290,7 +301,7 @@ export const subscribeToCollection = (collectionName, callback, options = {}) =>
   try {
     const constraints = [];
     if (options.orderByField) constraints.push(orderBy(options.orderByField, 'desc'));
-    if (options.limitCount)   constraints.push(limit(options.limitCount));
+    if (options.limitCount) constraints.push(limit(options.limitCount));
 
     const q = query(collection(db, collectionName), ...constraints);
     return onSnapshot(
@@ -388,10 +399,7 @@ export const logout = async () => {
   if (!auth) throw new Error('Firebase not configured.');
   const uid = auth.currentUser?.uid;
   if (uid) {
-    await Promise.allSettled([
-      logAnalyticsEvent('logout', { uid }),
-      logUserAction(uid, 'logout'),
-    ]);
+    await Promise.allSettled([logAnalyticsEvent('logout', { uid }), logUserAction(uid, 'logout')]);
   }
   await signOut(auth);
 };

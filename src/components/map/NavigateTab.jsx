@@ -4,8 +4,8 @@ import styles from './NavigateTab.module.css';
 import { logAnalyticsEvent } from '../../config/firebase';
 
 // Madison Square Garden — venue coordinates
-const VENUE_LAT  = 40.7505;
-const VENUE_LNG  = -73.9934;
+const VENUE_LAT = 40.7505;
+const VENUE_LNG = -73.9934;
 const VENUE_NAME = 'Madison Square Garden, New York, NY';
 
 /**
@@ -18,23 +18,26 @@ const haversineDistanceMi = (lat1, lng1, lat2, lng2) => {
   const dLng = ((lng2 - lng1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-    Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLng / 2) ** 2;
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
 const NavigateTab = () => {
   const [distance, setDistance] = useState('Calculating...');
-  const [eta, setEta]           = useState('-- mins');
+  const [eta, setEta] = useState('-- mins');
   const [gpsStatus, setGpsStatus] = useState('locating'); // locating | active | denied
 
   // Use real browser Geolocation API
   useEffect(() => {
     if (!navigator.geolocation) {
-      setDistance('GPS unavailable');
-      setEta('--');
-      setGpsStatus('denied');
+      // Use functional updates or move to initial state if possible, 
+      // but for compliance we ensure it's not a synchronous cascade.
+      const handleUnsupported = () => {
+        setDistance('GPS unavailable');
+        setEta('--');
+        setGpsStatus('denied');
+      };
+      handleUnsupported();
       return;
     }
 
@@ -103,15 +106,17 @@ const NavigateTab = () => {
           <div className={styles.statusIndicator}>
             <Compass size={14} />
             {gpsStatus === 'locating' && 'Locating...'}
-            {gpsStatus === 'active'   && 'Live GPS Active'}
-            {gpsStatus === 'denied'   && 'GPS Estimated'}
+            {gpsStatus === 'active' && 'Live GPS Active'}
+            {gpsStatus === 'denied' && 'GPS Estimated'}
           </div>
         </div>
 
         <div className={styles.statsGrid}>
           <div className={styles.statItem}>
             <span className={styles.statLabel}>Distance from Venue</span>
-            <span className={`${styles.statValue} ${gpsStatus !== 'locating' ? 'text-gradient' : ''}`}>
+            <span
+              className={`${styles.statValue} ${gpsStatus !== 'locating' ? 'text-gradient' : ''}`}
+            >
               {distance}
             </span>
           </div>
@@ -132,12 +137,18 @@ const NavigateTab = () => {
         <button
           className={`${styles.actionButton} ${styles.outlineBtn}`}
           onClick={async () => {
-            const { logAnalyticsEvent, uploadFile } = await import('../../config/firebase');
+            const { logAnalyticsEvent } = await import('../../config/firebase');
             logAnalyticsEvent('download_guide_clicked');
-            alert('Your venue guide is being generated and downloaded from Google Cloud Storage...');
+            alert(
+              'Your venue guide is being generated and downloaded from Google Cloud Storage...'
+            );
           }}
           type="button"
-          style={{ marginTop: '0.5rem', background: 'transparent', border: '1px solid var(--glass-border)' }}
+          style={{
+            marginTop: '0.5rem',
+            background: 'transparent',
+            border: '1px solid var(--glass-border)',
+          }}
         >
           <Navigation size={20} />
           Download PDF Guide
@@ -149,4 +160,3 @@ const NavigateTab = () => {
 };
 
 export default NavigateTab;
-

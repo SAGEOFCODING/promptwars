@@ -23,73 +23,131 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Firebase config — no real SDK calls
 vi.mock('./config/firebase', () => ({
-  auth:                           null,
-  db:                             null,
-  storage:                        null,
-  loginWithGoogle:                vi.fn().mockResolvedValue({ uid: 'google-sim-user', email: 'google-user@example.com', displayName: 'Google Explorer', photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=google' }),
-  loginWithEmail:                 vi.fn(),
-  registerWithEmail:              vi.fn(),
-  logout:                         vi.fn(),
-  logAnalyticsEvent:              vi.fn().mockResolvedValue(undefined),
-  setAnalyticsUser:               vi.fn().mockResolvedValue(undefined),
-  incrementCounter:               vi.fn().mockResolvedValue(undefined),
-  upsertUserProfile:              vi.fn().mockResolvedValue(undefined),
-  logUserSession:                 vi.fn().mockResolvedValue('session-id'),
-  logUserAction:                  vi.fn().mockResolvedValue(undefined),
-  subscribeToCollection:          vi.fn().mockReturnValue(() => {}),
-  getRemoteConfigValue:           vi.fn().mockReturnValue(null),
-  perf:                           null,
-  remoteConfig:                   null,
-  logBrowserCapabilities:         vi.fn(),
-  messaging:                      null,
-  requestNotificationPermission:  vi.fn().mockResolvedValue('test-token'),
-  signInWithEmailAndPassword:     vi.fn(),
+  auth: null,
+  db: null,
+  storage: null,
+  loginWithGoogle: vi
+    .fn()
+    .mockResolvedValue({
+      uid: 'google-sim-user',
+      email: 'google-user@example.com',
+      displayName: 'Google Explorer',
+      photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=google',
+    }),
+  loginWithEmail: vi.fn(),
+  registerWithEmail: vi.fn(),
+  logout: vi.fn(),
+  logAnalyticsEvent: vi.fn().mockResolvedValue(undefined),
+  setAnalyticsUser: vi.fn().mockResolvedValue(undefined),
+  incrementCounter: vi.fn().mockResolvedValue(undefined),
+  upsertUserProfile: vi.fn().mockResolvedValue(undefined),
+  logUserSession: vi.fn().mockResolvedValue('session-id'),
+  logUserAction: vi.fn().mockResolvedValue(undefined),
+  subscribeToCollection: vi.fn().mockReturnValue(() => {}),
+  getRemoteConfigValue: vi.fn().mockReturnValue(null),
+  perf: null,
+  remoteConfig: null,
+  logBrowserCapabilities: vi.fn(),
+  messaging: null,
+  requestNotificationPermission: vi.fn().mockResolvedValue('test-token'),
+  signInWithEmailAndPassword: vi.fn(),
   createUserWithEmailAndPassword: vi.fn(),
 }));
 
 vi.mock('firebase/auth', () => ({
-  onAuthStateChanged: vi.fn((_auth, cb) => { cb(null); return vi.fn(); }),
-  getAuth:            vi.fn(),
+  onAuthStateChanged: vi.fn((_auth, cb) => {
+    cb(null);
+    return vi.fn();
+  }),
+  getAuth: vi.fn(),
 }));
 
 // dataService — instant mock data, no async delays
 vi.mock('./services/dataService', () => ({
-  getVenueZones:    vi.fn().mockResolvedValue([
-    { id: 'north', name: 'North Gate', crowd: 'low',    wait: '5 mins'  },
-    { id: 'south', name: 'South Gate', crowd: 'high',   wait: '25 mins' },
-    { id: 'field', name: 'Main Field', crowd: 'low',    wait: 'No Queue' },
+  getVenueZones: vi.fn().mockResolvedValue([
+    { id: 'north', name: 'North Gate', crowd: 'low', wait: '5 mins' },
+    { id: 'south', name: 'South Gate', crowd: 'high', wait: '25 mins' },
+    { id: 'field', name: 'Main Field', crowd: 'low', wait: 'No Queue' },
     { id: 'food1', name: 'Food Court', crowd: 'medium', wait: '12 mins' },
-    { id: 'merch', name: 'Merch Store',crowd: 'high',   wait: '30 mins' },
+    { id: 'merch', name: 'Merch Store', crowd: 'high', wait: '30 mins' },
   ]),
   getNotifications: vi.fn().mockResolvedValue([
-    { id: 1, type: 'danger',  title: 'High Crowd', message: 'South Gate congested', time: '2 mins ago'  },
-    { id: 2, type: 'info',    title: 'Merch Drop', message: 'New jerseys available', time: '15 mins ago' },
+    {
+      id: 1,
+      type: 'danger',
+      title: 'High Crowd',
+      message: 'South Gate congested',
+      time: '2 mins ago',
+    },
+    {
+      id: 2,
+      type: 'info',
+      title: 'Merch Drop',
+      message: 'New jerseys available',
+      time: '15 mins ago',
+    },
   ]),
   getQueues: vi.fn().mockResolvedValue([
-    { id: 1, title: 'Food Court A', location: 'Sec 102', waitTime: '12 mins', type: 'food',  trend: 'up'     },
-    { id: 2, title: 'Main Merch',   location: 'Gate C',  waitTime: '30 mins', type: 'merch', trend: 'stable' },
+    {
+      id: 1,
+      title: 'Food Court A',
+      location: 'Sec 102',
+      waitTime: '12 mins',
+      type: 'food',
+      trend: 'up',
+    },
+    {
+      id: 2,
+      title: 'Main Merch',
+      location: 'Gate C',
+      waitTime: '30 mins',
+      type: 'merch',
+      trend: 'stable',
+    },
   ]),
-  getVenueStats: vi.fn().mockResolvedValue({ capacityPercentage: 78, highTrafficZones: ['South Gate'] }),
+  getVenueStats: vi
+    .fn()
+    .mockResolvedValue({ capacityPercentage: 78, highTrafficZones: ['South Gate'] }),
   subscribeToZones: vi.fn((cb) => {
     cb([
-      { id: 'north', name: 'North Gate', crowd: 'low',    wait: '5 mins'  },
-      { id: 'south', name: 'South Gate', crowd: 'high',   wait: '25 mins' },
-      { id: 'field', name: 'Main Field', crowd: 'low',    wait: 'No Queue' },
+      { id: 'north', name: 'North Gate', crowd: 'low', wait: '5 mins' },
+      { id: 'south', name: 'South Gate', crowd: 'high', wait: '25 mins' },
+      { id: 'field', name: 'Main Field', crowd: 'low', wait: 'No Queue' },
       { id: 'food1', name: 'Food Court', crowd: 'medium', wait: '12 mins' },
-      { id: 'merch', name: 'Merch Store',crowd: 'high',   wait: '30 mins' },
+      { id: 'merch', name: 'Merch Store', crowd: 'high', wait: '30 mins' },
     ]);
     return vi.fn();
   }),
   subscribeToNotifications: vi.fn((cb) => {
     cb([
-      { id: 1, type: 'danger',  title: 'High Crowd', message: 'South Gate congested', time: '2 mins ago'  },
+      {
+        id: 1,
+        type: 'danger',
+        title: 'High Crowd',
+        message: 'South Gate congested',
+        time: '2 mins ago',
+      },
     ]);
     return vi.fn();
   }),
   subscribeToQueues: vi.fn((cb) => {
     cb([
-      { id: 1, title: 'Food Court A', location: 'Sec 102', waitTime: '12 mins', type: 'food',  trend: 'up'     },
-      { id: 2, title: 'Main Merch',   location: 'Gate C',  waitTime: '30 mins', type: 'merch', trend: 'stable' },
+      {
+        id: 1,
+        title: 'Food Court A',
+        location: 'Sec 102',
+        waitTime: '12 mins',
+        type: 'food',
+        trend: 'up',
+      },
+      {
+        id: 2,
+        title: 'Main Merch',
+        location: 'Gate C',
+        waitTime: '30 mins',
+        type: 'merch',
+        trend: 'stable',
+      },
     ]);
     return vi.fn();
   }),
@@ -104,7 +162,9 @@ const renderApp = () => render(<App />);
 
 // ─── Test Suite ──────────────────────────────────────────────────────────────
 describe('App — Integration & Edge Cases', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   // Core render
   it('renders the Map tab by default', async () => {
@@ -196,4 +256,3 @@ describe('App — Integration & Edge Cases', () => {
     await waitFor(() => expect(screen.getByText('High Crowd')).toBeInTheDocument());
   });
 });
-

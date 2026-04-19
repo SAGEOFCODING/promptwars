@@ -29,7 +29,10 @@ vi.mock('./config/firebase', () => ({
 }));
 
 vi.mock('firebase/auth', () => ({
-  onAuthStateChanged: vi.fn((_auth, cb) => { cb(null); return vi.fn(); }),
+  onAuthStateChanged: vi.fn((_auth, cb) => {
+    cb(null);
+    return vi.fn();
+  }),
   getAuth: vi.fn(),
 }));
 

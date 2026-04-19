@@ -1,11 +1,11 @@
 // Mock Data for Eventlytics Prototype
 
 export const venueZonesData = [
-  { id: 'north', name: 'North Gate',  crowd: 'low',    wait: '5 mins'  },
-  { id: 'south', name: 'South Gate',  crowd: 'high',   wait: '25 mins' },
+  { id: 'north', name: 'North Gate', crowd: 'low', wait: '5 mins' },
+  { id: 'south', name: 'South Gate', crowd: 'high', wait: '25 mins' },
   { id: 'food1', name: 'Food Court A', crowd: 'medium', wait: '12 mins' },
-  { id: 'merch', name: 'Merch Store', crowd: 'high',   wait: '30 mins' },
-  { id: 'field', name: 'Main Field',  crowd: 'low',    wait: 'No Queue' },
+  { id: 'merch', name: 'Merch Store', crowd: 'high', wait: '30 mins' },
+  { id: 'field', name: 'Main Field', crowd: 'low', wait: 'No Queue' },
 ];
 
 export const notificationsData = [

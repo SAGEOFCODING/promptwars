@@ -6,7 +6,13 @@ import HeatmapTab from './components/map/HeatmapTab';
 import QueueList from './components/queues/QueueList';
 import NotificationFeed from './components/alerts/NotificationFeed';
 import Login from './components/auth/Login';
-import { auth, logAnalyticsEvent, upsertUserProfile, setAnalyticsUser, logBrowserCapabilities } from './config/firebase';
+import {
+  auth,
+  logAnalyticsEvent,
+  upsertUserProfile,
+  setAnalyticsUser,
+  logBrowserCapabilities,
+} from './config/firebase';
 import { logNavigationAction } from './services/dataService';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -27,7 +33,7 @@ function App() {
         setAnalyticsUser(currentUser.uid, {
           email: currentUser.email,
           user_type: currentUser.isAnonymous ? 'guest' : 'registered',
-          last_login: new Date().toISOString()
+          last_login: new Date().toISOString(),
         });
         logAnalyticsEvent('user_session_resumed', { uid: currentUser.uid });
       }
@@ -42,7 +48,7 @@ function App() {
       navigate: 'Venue Directions',
       heatmap: 'Live Crowd Density',
       alerts: 'Security & Info Alerts',
-      login: 'Account Portal'
+      login: 'Account Portal',
     };
     document.title = `Eventlytics | ${titles[currentTab] || 'Real-Time Intelligence'}`;
   }, [currentTab]);
