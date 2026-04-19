@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Header from './Header';
-import BottomNav from './BottomNav';
+import Header from '@/components/templates/Header';
+import BottomNav from '@/components/templates/BottomNav';
 import styles from './Layout.module.css';
 
 const Layout = ({ children, currentTab, setCurrentTab, user }) => {

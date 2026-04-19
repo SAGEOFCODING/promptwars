@@ -13,35 +13,12 @@ import { startTrace, stopTrace } from '@/services/telemetry';
 import DOMPurify from 'dompurify';
 import { useRateLimit } from '@/hooks/useRateLimit';
 
+import { useVenueData } from '@/hooks/useVenueData';
+
 const VenueMap = ({ setCurrentTab, user }) => {
   const [activeZone, setActiveZone] = useState(null);
-  const [zonesData, setZonesData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { zonesData, loading } = useVenueData();
   const { checkRateLimit } = useRateLimit(3000); // 3s cooldown
-
-  // Real-time Firestore listener for zones
-  useEffect(() => {
-    let isFirstUpdate = true;
-    const mapTrace = startTrace('map_load_time');
-
-    const unsubscribe = subscribeToZones((zones) => {
-      setZonesData(zones);
-      if (isFirstUpdate) {
-        stopTrace(mapTrace);
-        setLoading(false);
-        isFirstUpdate = false;
-        logAnalyticsEvent('venue_map_loaded', { zone_count: zones.length });
-        logger.info('Venue map initialized', { zoneCount: zones.length });
-      }
-    });
-
-    // Safety: if listener never fires, stop loading after 3s
-    const timeout = setTimeout(() => setLoading(false), 3000);
-    return () => {
-      unsubscribe();
-      clearTimeout(timeout);
-    };
-  }, []);
 
   const handleZoneClick = (id) => {
     const newActive = activeZone === id ? null : id;
@@ -273,7 +250,7 @@ const VenueMap = ({ setCurrentTab, user }) => {
                         const file = e.target.files[0];
                         if (file) {
                           const { uploadIncidentImage } =
-                            await import('../../services/storageService');
+                            await import('@/services/storageService');
                           const url = await uploadIncidentImage(file, activeZoneData.id);
                           if (url) alert('Photo uploaded successfully!');
                         }

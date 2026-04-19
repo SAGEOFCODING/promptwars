@@ -1,44 +1,21 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import Layout from './components/layout/Layout';
-import VenueMap from './components/map/VenueMap';
-import NavigateTab from './components/map/NavigateTab';
-import HeatmapTab from './components/map/HeatmapTab';
-import QueueList from './components/queues/QueueList';
-import NotificationFeed from './components/alerts/NotificationFeed';
-import Login from './components/auth/Login';
-import {
-  auth,
-  logAnalyticsEvent,
-  upsertUserProfile,
-  setAnalyticsUser,
-  logBrowserCapabilities,
-} from './config/firebase';
-import { logNavigationAction } from './services/dataService';
-import { onAuthStateChanged } from 'firebase/auth';
+import Layout from '@/components/templates/Layout';
+import VenueMap from '@/components/organisms/VenueMap';
+import NavigateTab from '@/components/organisms/NavigateTab';
+import HeatmapTab from '@/components/organisms/HeatmapTab';
+import QueueList from '@/components/organisms/QueueList';
+import NotificationFeed from '@/components/organisms/NotificationFeed';
+import Login from '@/components/organisms/Login';
+import { logAnalyticsEvent, logBrowserCapabilities } from '@/config/firebase';
+import { logNavigationAction } from '@/services/dataService';
+import { useAuthSession } from '@/hooks/useAuthSession';
 
 function App() {
   const [currentTab, setCurrentTab] = useState('map');
-  const [user, setUser] = useState(null);
+  const { user, setUser } = useAuthSession();
 
   useEffect(() => {
     logBrowserCapabilities();
-  }, []);
-
-  useEffect(() => {
-    if (!auth) return;
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser ?? null);
-      if (currentUser) {
-        upsertUserProfile(currentUser);
-        setAnalyticsUser(currentUser.uid, {
-          email: currentUser.email,
-          user_type: currentUser.isAnonymous ? 'guest' : 'registered',
-          last_login: new Date().toISOString(),
-        });
-        logAnalyticsEvent('user_session_resumed', { uid: currentUser.uid });
-      }
-    });
-    return unsubscribe;
   }, []);
 
   useEffect(() => {
@@ -101,7 +78,7 @@ function App() {
       default:
         return <VenueMap setCurrentTab={handleTabChange} user={user} />;
     }
-  }, [currentTab, user, handleTabChange]);
+  }, [currentTab, user, handleTabChange, setUser]);
 
   return (
     <Layout currentTab={currentTab} setCurrentTab={handleTabChange} user={user}>

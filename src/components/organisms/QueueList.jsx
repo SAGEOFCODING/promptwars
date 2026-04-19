@@ -1,23 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import QueueCard from './QueueCard';
-import { subscribeToQueues } from '../../services/dataService';
-import { logAnalyticsEvent } from '../../config/firebase';
+import QueueCard from '@/components/molecules/QueueCard';
+import { useQueues } from '@/hooks/useQueues';
 
 const QueueList = ({ user }) => {
-  const [queues, setQueues] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    logAnalyticsEvent('queue_list_viewed');
-
-    const unsubscribe = subscribeToQueues((data) => {
-      setQueues(data);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
+  const { queues, loading } = useQueues();
 
   return (
     <>
