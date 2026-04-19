@@ -7,9 +7,9 @@ import {
   logZoneInteraction,
   submitCrowdReport,
 } from '@/services/dataService';
-import { logAnalyticsEvent, perf } from '@/config/firebase';
-import { trace } from 'firebase/performance';
+import { logAnalyticsEvent } from '@/config/firebase';
 import { logger } from '@/services/logger';
+import { startTrace, stopTrace } from '@/services/telemetry';
 import DOMPurify from 'dompurify';
 import { useRateLimit } from '@/hooks/useRateLimit';
 
@@ -17,18 +17,17 @@ const VenueMap = ({ setCurrentTab, user }) => {
   const [activeZone, setActiveZone] = useState(null);
   const [zonesData, setZonesData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { checkRateLimit, isRateLimited } = useRateLimit(3000); // 3s cooldown
+  const { checkRateLimit } = useRateLimit(3000); // 3s cooldown
 
   // Real-time Firestore listener for zones
   useEffect(() => {
     let isFirstUpdate = true;
-    const mapTrace = perf ? trace(perf, 'map_load_time') : null;
-    if (mapTrace) mapTrace.start();
+    const mapTrace = startTrace('map_load_time');
 
     const unsubscribe = subscribeToZones((zones) => {
       setZonesData(zones);
       if (isFirstUpdate) {
-        if (mapTrace) mapTrace.stop();
+        stopTrace(mapTrace);
         setLoading(false);
         isFirstUpdate = false;
         logAnalyticsEvent('venue_map_loaded', { zone_count: zones.length });
