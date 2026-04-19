@@ -12,7 +12,6 @@ import { useAuthSession } from '@/hooks/useAuthSession';
 import { UI_STRINGS } from '@/constants';
 
 function App() {
-  console.log('[DIAGNOSTIC] App Component Rendering...');
   const [currentTab, setCurrentTab] = useState('map');
   const { user, setUser } = useAuthSession();
 
