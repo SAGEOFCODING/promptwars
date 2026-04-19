@@ -35,6 +35,7 @@ import {
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getPerformance } from 'firebase/performance';
 import { getRemoteConfig, fetchAndActivate, getValue } from 'firebase/remote-config';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 
 // ─── Firebase Config ────────────────────────────────────────────────────────
 const firebaseConfig = {
@@ -81,9 +82,10 @@ const analyticsReady = isConfigured
   : Promise.resolve(null);
 
 /**
- * Log an Analytics event — no-ops gracefully when Analytics isn't ready.
- * @param {string} eventName
- * @param {object} params
+ * Log a user action or custom event to Firebase Analytics.
+ * @param {string} eventName - The name of the event (e.g., 'tab_navigation').
+ * @param {Object} [params={}] - Key-value pairs of event parameters.
+ * @returns {Promise<void>}
  */
 export const logAnalyticsEvent = async (eventName, params = {}) => {
   const analytics = analyticsInstance ?? (await analyticsReady);
@@ -92,11 +94,17 @@ export const logAnalyticsEvent = async (eventName, params = {}) => {
       ...params,
       timestamp: Date.now(),
       app_version: '1.0.0',
+      environment: isConfigured ? 'production' : 'development',
     });
   }
 };
 
-/** Set the Analytics user ID when a user logs in */
+/**
+ * Set the Analytics User ID and associated properties for session tracking.
+ * @param {string} uid - The unique Firebase Authentication UID.
+ * @param {Object} [properties={}] - Custom user properties (e.g., { user_type: 'guest' }).
+ * @returns {Promise<void>}
+ */
 export const setAnalyticsUser = async (uid, properties = {}) => {
   const analytics = analyticsInstance ?? (await analyticsReady);
   if (analytics && uid) {
@@ -138,6 +146,33 @@ export const remoteConfig = (() => {
     return null;
   }
 })();
+
+// ─── Firebase Cloud Messaging ────────────────────────────────────────────────
+let messagingInstance = null;
+if (isConfigured && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  try {
+    messagingInstance = getMessaging(app);
+  } catch {
+    // Messaging not supported
+  }
+}
+export const messaging = messagingInstance;
+
+export const requestNotificationPermission = async () => {
+  if (!messagingInstance) return null;
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      const token = await getToken(messagingInstance, {
+        vapidKey: 'BM-X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X' // Generic placeholder
+      });
+      return token;
+    }
+  } catch (err) {
+    console.error('An error occurred while retrieving token. ', err);
+  }
+  return null;
+};
 
 export const getRemoteConfigValue = (key) => {
   if (!remoteConfigInstance) return null;

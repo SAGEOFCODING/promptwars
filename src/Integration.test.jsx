@@ -24,6 +24,8 @@ vi.mock('./config/firebase', () => ({
   getRemoteConfigValue: vi.fn(),
   perf: null,
   logBrowserCapabilities: vi.fn(),
+  messaging: null,
+  requestNotificationPermission: vi.fn().mockResolvedValue('test-token'),
 }));
 
 vi.mock('firebase/auth', () => ({

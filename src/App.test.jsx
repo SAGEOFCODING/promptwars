@@ -41,6 +41,8 @@ vi.mock('./config/firebase', () => ({
   perf:                           null,
   remoteConfig:                   null,
   logBrowserCapabilities:         vi.fn(),
+  messaging:                      null,
+  requestNotificationPermission:  vi.fn().mockResolvedValue('test-token'),
   signInWithEmailAndPassword:     vi.fn(),
   createUserWithEmailAndPassword: vi.fn(),
 }));

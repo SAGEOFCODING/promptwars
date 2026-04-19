@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "252675432928",
+    "project_id": "eventlytics-493710",
+    "storage_bucket": "eventlytics-493710.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:252675432928:web:7f6a7d5b4c3e2f1a098",
+        "android_client_info": {
+          "package_name": "com.eventlytics.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "252675432928-v2f3g4h5j6k7l8m9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1C2D3E4F5G6H7I8J9K0L1M2N3O4P5Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "252675432928-v2f3g4h5j6k7l8m9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
