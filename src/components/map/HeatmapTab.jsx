@@ -28,7 +28,7 @@ const HeatmapTab = ({ setCurrentTab, user }) => {
       <h2 style={{ marginBottom: '0.5rem', fontSize: '1.5rem', fontWeight: 600 }}>
         Live Crowd Heatmap
       </h2>
-      <p style={{ color: 'var(--text-muted)' }}>
+      <p style={{ color: 'var(--text-muted)' }} aria-live="polite">
         The venue is currently at <strong>{stats.capacityPercentage}% capacity</strong>.<br />
         Please avoid the {stats.highTrafficZones.join(', ')} area.
       </p>

@@ -18,6 +18,31 @@ const hasFirebase =
   import.meta.env.VITE_FIREBASE_PROJECT_ID !== 'mock-project-id';
 
 /**
+ * @typedef {Object} Zone
+ * @property {string} id - Unique identifier for the zone
+ * @property {string} name - Display name of the zone
+ * @property {string} crowd - Crowd level (low|medium|high)
+ * @property {string} wait - Human-readable wait time (e.g. "5 mins")
+ * @property {string} [status] - Optional status message
+ */
+
+/**
+ * @typedef {Object} Notification
+ * @property {string} id - Unique identifier
+ * @property {string} title - Notification title
+ * @property {string} message - Notification body
+ * @property {string} type - info|warning|danger
+ * @property {import('firebase/firestore').Timestamp} timestamp - Firestore timestamp
+ */
+
+/**
+ * @typedef {Object} VenueStats
+ * @property {number} totalCrowd - Total estimated attendance
+ * @property {number} entryCapacity - Percentage of entry capacity utilized
+ * @property {number} activeAlerts - Count of high-severity alerts
+ */
+
+/**
  * Generic Firestore collection fetch with mock fallback.
  * @param {string} collectionName  - Firestore collection
  * @param {import('firebase/firestore').QueryConstraint[]} constraints

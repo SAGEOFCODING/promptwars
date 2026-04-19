@@ -1,53 +1,37 @@
-# Eventlytics Venue App 🏟️
+# Eventlytics - Real-Time Venue Intelligence
 
-Eventlytics is a production-grade, mobile-first web application designed for real-time venue management. Built with a futuristic aesthetic and high-performance architecture, it empowers venue staff and attendees with live crowd data, wait-time monitoring, and seamless navigation.
+Eventlytics is a production-grade, mobile-first web application designed for large-scale sporting venues. It provides real-time crowd insights, venue navigation, and wait-time tracking.
 
-## ✨ Key Features
-- **Interactive Venue Map**: SVG-based live map with real-time zone status.
-- **Google Maps Integration**: Deep-linked navigation for native app experiences.
-- **Smart Queue Management**: Live wait-time tracking and crowd density alerts.
-- **Firebase Suite**: Complete integration with Auth (Google/Email), Firestore, and Analytics.
-- **Guest Mode**: Zero-config "Guest Explorer" mode for instant app evaluation.
-- **PWA Ready**: Offline support and home-screen installation for venue staff.
+## 🏗️ Architecture
+- **Framework**: React 19 + Vite 8
+- **State Management**: React Hooks + Firestore Real-Time Listeners
+- **Security**: Content Security Policy (CSP), DOMPurify, Rate Limiting, and Firebase App Check.
+- **Performance**: Multi-stage Docker builds, manual chunking for vendor assets, and PWA capabilities.
+- **Testing**: Vitest + React Testing Library (100% pass rate).
 
-## 🛠️ Technology Stack
-- **Core**: React 19 + Vite 8
-- **Backend**: Firebase (Auth, Firestore, Analytics)
-- **Styling**: Vanilla CSS Modules (Glassmorphism & Neon Design)
-- **Testing**: Vitest + React Testing Library (33+ Integration/Unit tests)
-- **Deployment**: Google Cloud Run + Docker + NGINX
+## 🛡️ Security Hardening
+- **XSS Prevention**: Strict CSP headers and DOMPurify sanitization on all user inputs.
+- **Brute-Force Protection**: Client-side rate limiting via `useRateLimit` hook.
+- **Infrastructure**: Firebase Security Rules for Firestore and Storage, enforcing strict per-user access.
+- **Privacy**: Anonymous authentication fallback with secure Guest Mode.
 
-## 🚀 Getting Started
+## ⚡ Performance Optimization
+- **Lighthouse Goals**: Target 98%+ score across all categories.
+- **Bundle Analysis**: Optimized vendor chunking for Firebase and React.
+- **PWA**: Offline support and asset precaching via `vite-plugin-pwa`.
 
-1. **Install dependencies**
-   ```bash
-   npm install --legacy-peer-deps
-   ```
+## ♿ Accessibility (WCAG 2.1)
+- Full keyboard navigation support for interactive SVG maps.
+- ARIA landmarks and live regions (`aria-live="polite"`) for real-time notifications.
+- "Skip to Content" accessibility link and high-contrast glassmorphism UI.
 
-2. **Configure Environment** (Optional)
-   Create a `.env` file with your Firebase credentials to enable production services. If omitted, the app defaults to **Guest Mode**.
-   ```env
-   VITE_FIREBASE_API_KEY=your_key
-   VITE_FIREBASE_AUTH_DOMAIN=your_domain
-   ...
-   ```
-
-3. **Run Locally**
-   ```bash
-   npm run dev
-   ```
-
-## 🧪 Testing & Quality
-The project maintains a **100% pass rate** on all core functions and edge cases.
+## 🛠️ Developer Setup
 ```bash
+npm install
+npm run dev
 npm run test
-```
-
-## ☁️ Deployment
-The project is containerized via Docker and served through NGINX, optimized for Google Cloud Run.
-```bash
-gcloud run deploy eventlytics --source . --project [PROJECT_ID]
+npm run build
 ```
 
 ---
-*Built with ❤️ by the Eventlytics Engineering Team.*
+Deployed to **Google Cloud Run** using automated CI/CD patterns.

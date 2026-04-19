@@ -6,16 +6,18 @@ import {
   subscribeToZones,
   logZoneInteraction,
   submitCrowdReport,
-} from '../../services/dataService';
-import { logAnalyticsEvent, perf } from '../../config/firebase';
+} from '@/services/dataService';
+import { logAnalyticsEvent, perf } from '@/config/firebase';
 import { trace } from 'firebase/performance';
-import { logger } from '../../services/logger';
+import { logger } from '@/services/logger';
 import DOMPurify from 'dompurify';
+import { useRateLimit } from '@/hooks/useRateLimit';
 
 const VenueMap = ({ setCurrentTab, user }) => {
   const [activeZone, setActiveZone] = useState(null);
   const [zonesData, setZonesData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { checkRateLimit, isRateLimited } = useRateLimit(3000); // 3s cooldown
 
   // Real-time Firestore listener for zones
   useEffect(() => {
@@ -56,6 +58,10 @@ const VenueMap = ({ setCurrentTab, user }) => {
 
   const handleCrowdReport = async (level) => {
     if (!activeZoneData) return;
+    if (!checkRateLimit()) {
+      logger.warn('Crowd report rate limited', { zoneId: activeZoneData.id });
+      return;
+    }
     await submitCrowdReport(user?.uid, activeZoneData.id, level);
   };
 
