@@ -9,6 +9,7 @@ import Login from '@/components/organisms/Login';
 import { logAnalyticsEvent, logBrowserCapabilities } from '@/config/firebase';
 import { logNavigationAction } from '@/services/dataService';
 import { useAuthSession } from '@/hooks/useAuthSession';
+import { UI_STRINGS } from '@/constants';
 
 function App() {
   const [currentTab, setCurrentTab] = useState('map');
@@ -20,14 +21,14 @@ function App() {
 
   useEffect(() => {
     const titles = {
-      map: 'Interactive Venue Map',
-      queues: 'Live Wait Times',
-      navigate: 'Venue Directions',
-      heatmap: 'Live Crowd Density',
-      alerts: 'Security & Info Alerts',
-      login: 'Account Portal',
+      map: UI_STRINGS.MAP_TITLE,
+      queues: UI_STRINGS.QUEUES_TITLE,
+      navigate: UI_STRINGS.NAVIGATE_TITLE,
+      heatmap: UI_STRINGS.HEATMAP_TITLE,
+      alerts: UI_STRINGS.ALERTS_TITLE,
+      login: UI_STRINGS.LOGIN_TITLE,
     };
-    document.title = `Eventlytics | ${titles[currentTab] || 'Real-Time Intelligence'}`;
+    document.title = `${UI_STRINGS.APP_NAME} | ${titles[currentTab] || 'Real-Time Intelligence'}`;
   }, [currentTab]);
 
   const handleTabChange = useCallback(

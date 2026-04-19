@@ -2,14 +2,15 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import QueueList from './QueueList';
-import * as dataService from '../../services/dataService';
+import * as dataService from '@/services/dataService';
 
-vi.mock('../../services/dataService', () => ({
+vi.mock('@/services/dataService', () => ({
   __esModule: true,
   subscribeToQueues: vi.fn(),
+  subscribeToNotifications: vi.fn(),
 }));
 
-vi.mock('../../config/firebase', () => ({
+vi.mock('@/config/firebase', () => ({
   logAnalyticsEvent: vi.fn(),
 }));
 

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
-import ErrorBoundary from './components/common/ErrorBoundary.jsx';
+import ErrorBoundary from '@/components/molecules/ErrorBoundary.jsx';
 import { logger } from '@/services/logger';
 
 // Global error handling for production stability

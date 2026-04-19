@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Navigation, MapPin, Compass, Car, ExternalLink } from 'lucide-react';
 import styles from './NavigateTab.module.css';
-import { logAnalyticsEvent } from '../../config/firebase';
-
-// Madison Square Garden — venue coordinates
-const VENUE_LAT = 40.7505;
-const VENUE_LNG = -73.9934;
-const VENUE_NAME = 'Madison Square Garden, New York, NY';
+import { logAnalyticsEvent } from '@/config/firebase';
+import { VENUE_CONFIG, API_CONFIG } from '@/constants';
 
 /**
  * Calculate straight-line distance (Haversine) between two lat/lng points.
@@ -44,9 +40,8 @@ const NavigateTab = () => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        const mi = haversineDistanceMi(latitude, longitude, VENUE_LAT, VENUE_LNG);
-        // Rough estimate: avg driving speed 25 mph in NYC
-        const etaMins = Math.round((mi / 25) * 60);
+        const mi = haversineDistanceMi(latitude, longitude, VENUE_CONFIG.LAT, VENUE_CONFIG.LNG);
+        const etaMins = Math.round((mi / VENUE_CONFIG.AVG_DRIVING_SPEED) * 60);
         setDistance(`${mi.toFixed(1)} mi`);
         setEta(`${etaMins} mins`);
         setGpsStatus('active');
@@ -57,24 +52,21 @@ const NavigateTab = () => {
         });
       },
       () => {
-        // Permission denied or error — show a reasonable default
         setDistance('2.4 mi');
         setEta('12 mins');
         setGpsStatus('denied');
       },
-      { timeout: 8000, maximumAge: 60000 }
+      { timeout: API_CONFIG.GPS_TIMEOUT, maximumAge: API_CONFIG.GPS_MAX_AGE }
     );
   }, []);
 
-  // Opens Google Maps Directions to the venue in a new tab / native Maps app
   const handleOpenMaps = useCallback(() => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(VENUE_NAME)}&travelmode=driving`;
-    logAnalyticsEvent('open_maps_directions', { venue: VENUE_NAME });
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(VENUE_CONFIG.NAME)}&travelmode=driving`;
+    logAnalyticsEvent('open_maps_directions', { venue: VENUE_CONFIG.NAME });
     window.open(url, '_blank', 'noopener,noreferrer');
   }, []);
 
-  // Google Maps Embed URL — free, no API key required for basic embeds
-  const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(VENUE_NAME)}&output=embed&z=15`;
+  const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(VENUE_CONFIG.NAME)}&output=embed&z=15`;
 
   return (
     <div className={styles.container}>

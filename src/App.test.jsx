@@ -22,7 +22,7 @@ Object.defineProperty(window, 'matchMedia', {
 // ─── Module mocks ────────────────────────────────────────────────────────────
 
 // Firebase config — no real SDK calls
-vi.mock('./config/firebase', () => ({
+vi.mock('@/config/firebase', () => ({
   auth: null,
   db: null,
   storage: null,
@@ -62,8 +62,8 @@ vi.mock('firebase/auth', () => ({
   getAuth: vi.fn(),
 }));
 
-// dataService — instant mock data, no async delays
-vi.mock('./services/dataService', () => ({
+// Data Service — mock Firestore listeners
+vi.mock('@/services/dataService', () => ({
   getVenueZones: vi.fn().mockResolvedValue([
     { id: 'north', name: 'North Gate', crowd: 'low', wait: '5 mins' },
     { id: 'south', name: 'South Gate', crowd: 'high', wait: '25 mins' },

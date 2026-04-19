@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { Info, AlertTriangle, ShieldAlert, Zap } from 'lucide-react';
 import styles from './NotificationFeed.module.css';
-import { subscribeToNotifications } from '../../services/dataService';
-import { logAnalyticsEvent, getRemoteConfigValue } from '../../config/firebase';
+import { logAnalyticsEvent, getRemoteConfigValue } from '@/config/firebase';
+import { useNotifications } from '@/hooks/useNotifications';
 
 // ─── Icon helpers ─────────────────────────────────────────────────────────────
 const ICON_MAP = {
@@ -46,22 +44,10 @@ NotificationCard.propTypes = {
 };
 
 // ─── Main component ───────────────────────────────────────────────────────────
-const NotificationFeed = ({ user }) => {
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+const NotificationFeed = () => {
+  const { notifications, loading } = useNotifications();
   const showEmergency = getRemoteConfigValue('emergency_banner_visible');
   const trafficWarning = getRemoteConfigValue('high_traffic_warning');
-
-  useEffect(() => {
-    logAnalyticsEvent('notification_feed_viewed');
-
-    const unsubscribe = subscribeToNotifications((data) => {
-      setNotifications(data);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
 
   if (loading) {
     return (
