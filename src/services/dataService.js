@@ -10,6 +10,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import { db, logAnalyticsEvent, incrementCounter } from '@/config/firebase';
+import { venueZonesData, notificationsData, queueData, venueStats } from '@/data/mockData';
 
 /**
  * @typedef {Object} Zone

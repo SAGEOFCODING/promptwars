@@ -1,7 +1,9 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import QueueCard from '@/components/molecules/QueueCard';
 import { useQueues } from '@/hooks/useQueues';
 
-const QueueList = ({ user }) => {
+const QueueList = () => {
   const { queues, loading } = useQueues();
 
   return (
@@ -36,8 +38,6 @@ const QueueList = ({ user }) => {
   );
 };
 
-QueueList.propTypes = {
-  user: PropTypes.object,
-};
+QueueList.propTypes = {};
 
 export default QueueList;

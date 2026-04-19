@@ -1,6 +1,8 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Info, AlertTriangle, ShieldAlert, Zap } from 'lucide-react';
 import styles from './NotificationFeed.module.css';
-import { logAnalyticsEvent, getRemoteConfigValue } from '@/config/firebase';
+import { getRemoteConfigValue } from '@/config/firebase';
 import { useNotifications } from '@/hooks/useNotifications';
 
 // ─── Icon helpers ─────────────────────────────────────────────────────────────
@@ -83,8 +85,6 @@ const NotificationFeed = () => {
   );
 };
 
-NotificationFeed.propTypes = {
-  user: PropTypes.object,
-};
+NotificationFeed.propTypes = {};
 
 export default NotificationFeed;

@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import NavigateTab from './NavigateTab';
-import { logAnalyticsEvent } from '@/config/firebase';
 
 // Mock Firebase analytics — no real SDK
 vi.mock('@/config/firebase', () => ({

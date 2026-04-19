@@ -6,12 +6,13 @@ import HeatmapTab from '@/components/organisms/HeatmapTab';
 import QueueList from '@/components/organisms/QueueList';
 import NotificationFeed from '@/components/organisms/NotificationFeed';
 import Login from '@/components/organisms/Login';
-import { logAnalyticsEvent, logBrowserCapabilities } from '@/config/firebase';
+import { logBrowserCapabilities } from '@/config/firebase';
 import { logNavigationAction } from '@/services/dataService';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { UI_STRINGS } from '@/constants';
 
 function App() {
+  console.log('[DIAGNOSTIC] App Component Rendering...');
   const [currentTab, setCurrentTab] = useState('map');
   const { user, setUser } = useAuthSession();
 

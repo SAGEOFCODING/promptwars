@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Navigation } from 'lucide-react';
 import styles from './VenueMap.module.css';
 import {
-  subscribeToZones,
   logZoneInteraction,
   submitCrowdReport,
 } from '@/services/dataService';
 import { logAnalyticsEvent } from '@/config/firebase';
 import { logger } from '@/services/logger';
-import { startTrace, stopTrace } from '@/services/telemetry';
 import DOMPurify from 'dompurify';
 import { useRateLimit } from '@/hooks/useRateLimit';
 

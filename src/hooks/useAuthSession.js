@@ -17,8 +17,8 @@ export const useAuthSession = () => {
 
   useEffect(() => {
     if (!auth) {
-      setLoading(false);
-      return;
+      const timer = setTimeout(() => setLoading(false), 0);
+      return () => clearTimeout(timer);
     }
 
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
