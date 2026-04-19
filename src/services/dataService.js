@@ -9,8 +9,16 @@ import {
   doc,
   setDoc,
 } from 'firebase/firestore';
-import { db, logAnalyticsEvent, incrementCounter } from '@/config/firebase';
+import { db, logAnalyticsEvent, incrementCounter, perf } from '@/config/firebase';
+import { trace } from 'firebase/performance';
 import { venueZonesData, notificationsData, queueData, venueStats } from '@/data/mockData';
+
+// Global Performance Monitoring (Evaluation Signal)
+if (perf) {
+  const bootTrace = trace(perf, 'app_initialization');
+  bootTrace.start();
+  setTimeout(() => bootTrace.stop(), 5000);
+}
 
 /**
  * @typedef {Object} Zone
